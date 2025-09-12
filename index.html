@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>子育てタイプ診断｜あなたはどのタイプのママ？</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Sans', 'ヒラギノ角ゴシック', 'Yu Gothic', 'メイリオ', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: #333;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .header p {
+            font-size: 16px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .question-container {
+            display: none;
+        }
+
+        .question-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .options {
+            margin-bottom: 40px;
+        }
+
+        .option {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            background: #f8f9ff;
+            border: 2px solid #e1e8ff;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .option:hover {
+            background: #e8f0ff;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .next-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .next-button.enabled {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .next-button:hover.enabled {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .result-container {
+            display: none;
+            text-align: center;
+        }
+
+        .result-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .result-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .result-type {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%);
+            border-radius: 15px;
+            border: 2px solid #e1e8ff;
+        }
+
+        .email-form-container {
+            margin-top: 30px;
+            padding: 30px;
+            background: #f8f9ff;
+            border-radius: 15px;
+            border: 2px solid #e1e8ff;
+        }
+
+        .email-button {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .email-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 154, 158, 0.3);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e1e8ff;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            .option {
+                padding: 12px 15px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>子育てタイプ診断<br>あなたはどのタイプのママ？</h1>
+            <p>子どもの登校しぶりや不登校に悩んでいるあなたへ。<br>
+            この診断では、あなたの「子育てスタイル」を客観的に知ることができます。<br>
+            5つの質問に答えるだけで、自分の特徴や思考のクセに気づき、前向きなヒントが得られます。</p>
+        </div>
+
+        <div class="content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- 質問1 -->
+            <div class="question-container active" id="question1">
+                <div class="question">
+                    <span class="question-number">質問1</span><br>
+                    子どもが学校に行きたがらない朝、あなたの対応は？
+                </div>
+                <div class="options">
+                    <button class="option" data-score="1">子どもの気持ちをじっくり聞いて、一緒に考える</button>
+                    <button class="option" data-score="2">無理には行かせず、様子を見守る</button>
+                    <button class="option" data-score="3">学校に行かない選択もありだと伝える</button>
+                    <button class="option" data-score="4">学校に行くよう説得しようとする</button>
+                </div>
+                <button class="next-button" id="next1">次へ</button>
+            </div>
+
+            <!-- 質問2 -->
+            <div class="question-container" id="question2">
+                <div class="question">
+                    <span class="question-number">質問2</span><br>
+                    子どもが「どうせ私なんて」とネガティブな発言をしたとき、あなたは？
+                </div>
+                <div class="options">
+                    <button class="option" data-score="1">「そんなことないよ」とすぐに否定する</button>
+                    <button class="option" data-score="2">「どうしてそう思うの？」と理由を聞いてみる</button>
+                    <button class="option" data-score="3">「そう思うこともあるよね」とまず共感する</button>
+                    <button class="option" data-score="4">「前向きになってほしい」と気持ちを切り替えさせようとする</button>
+                </div>
+                <button class="next-button" id="next2">次へ</button>
+            </div>
+
+            <!-- 質問3 -->
+            <div class="question-container" id="question3">
+                <div class="question">
+                    <span class="question-number">質問3</span><br>
+                    子どもがゲームやYouTubeなどに夢中で、家族の会話が減ってきたとき、あなたは？
+                </div>
+                <div class="options">
+                    <button class="option" data-score="4">スマホやゲームを取り上げるなど、ルールを強化する</button>
+                    <button class="option" data-score="3">「時間の使い方について話そう」と提案する</button>
+                    <button class="option" data-score="2">一緒に見たりプレイしたりして、共通の話題を作る</button>
+                    <button class="option" data-score="1">特に何も言わず、見守る</button>
+                </div>
+                <button class="next-button" id="next3">次へ</button>
+            </div>
+
+            <!-- 質問4 -->
+            <div class="question-container" id="question4">
+                <div class="question">
+                    <span class="question-number">質問4</span><br>
+                    子どもの将来について、あなたの考えは？
+                </div>
+                <div class="options">
+                    <button class="option" data-score="1">子どもの自由に決めてほしい</button>
+                    <button class="option" data-score="2">一緒に将来像を考えていきたい</button>
+                    <button class="option" data-score="3">ある程度、こうなってほしいという理想がある</button>
+                    <button class="option" data-score="4">親として進むべき方向は導いてあげたい</button>
+                </div>
+                <button class="next-button" id="next4">次へ</button>
+            </div>
+
+            <!-- 質問5 -->
+            <div class="question-container" id="question5">
+                <div class="question">
+                    <span class="question-number">質問5</span><br>
+                    周りの教育熱心なママたちの話を聞いて、あなたは？
+                </div>
+                <div class="options">
+                    <button class="option" data-score="4">自分のやり方に自信があるので気にならない</button>
+                    <button class="option" data-score="3">焦りは感じるけど、自分は自分と割り切っている</button>
+                    <button class="option" data-score="2">少し不安になり、自分のやり方を見直したくなる</button>
+                    <button class="option" data-score="1">周囲のやり方に合わせたほうがいいかも…と迷う</button>
+                </div>
+                <button class="next-button" id="next5">診断結果をメールで受け取る</button>
+            </div>
+
+            <!-- 結果画面 -->
+            <div class="result-container" id="result">
+                <div class="result-title">あなたの子育てタイプは...</div>
+                <div class="result-type" id="resultType"></div>
+                <div class="email-form-container">
+                    <p style="margin-bottom: 20px; font-size: 16px; line-height: 1.6;">
+                        詳しい診断結果とあなたのタイプに合った子育てのコツを<br>
+                        メールでお送りします。下記からメールアドレスをご登録ください。
+                    </p>
+                    <a href="#" class="email-button" id="emailButton" target="_blank">
+                        診断結果をメールで受け取る
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        let totalScore = 0;
+        const maxQuestions = 5;
+
+        // 各質問の選択肢にクリックイベントを追加
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                // 同じ質問内の他の選択肢の選択状態を解除
+                const container = this.closest('.question-container');
+                container.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // クリックした選択肢を選択状態にする
+                this.classList.add('selected');
+                
+                // 次へボタンを有効化
+                const nextButton = container.querySelector('.next-button');
+                nextButton.classList.add('enabled');
+            });
+        });
+
+        // 次へボタンのクリックイベント
+        document.querySelectorAll('.next-button').forEach(button => {
+            button.addEventListener('click', function() {
+                if (!this.classList.contains('enabled')) return;
+
+                const container = this.closest('.question-container');
+                const selectedOption = container.querySelector('.option.selected');
+                
+                if (selectedOption) {
+                    // スコアを加算
+                    totalScore += parseInt(selectedOption.dataset.score);
+                    
+                    // プログレスバーを更新
+                    updateProgress();
+                    
+                    if (currentQuestion < maxQuestions) {
+                        // 次の質問を表示
+                        showNextQuestion();
+                    } else {
+                        // 診断結果を表示
+                        showResult();
+                    }
+                }
+            });
+        });
+
+        function updateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const progress = (currentQuestion / maxQuestions) * 100;
+            progressFill.style.width = progress + '%';
+        }
+
+        function showNextQuestion() {
+            // 現在の質問を非表示
+            document.getElementById(`question${currentQuestion}`).classList.remove('active');
+            
+            // 次の質問を表示
+            currentQuestion++;
+            document.getElementById(`question${currentQuestion}`).classList.add('active');
+        }
+
+        function showResult() {
+            // 最後の質問を非表示
+            document.getElementById(`question${maxQuestions}`).classList.remove('active');
+            
+            // 診断結果を表示
+            document.getElementById('result').classList.add('active');
+            
+            // タイプを判定
+            let resultType, formUrl;
+            
+            if (totalScore >= 5 && totalScore <= 7) {
+                resultType = "おおらかママ";
+                formUrl = "https://55auto.biz/akko/registp/entryform2.htm";
+            } else if (totalScore >= 8 && totalScore <= 10) {
+                resultType = "共感じょうずママ";
+                formUrl = "https://55auto.biz/akko/registp/entryform4.htm";
+            } else if (totalScore >= 11 && totalScore <= 13) {
+                resultType = "バランスママ";
+                formUrl = "https://55auto.biz/akko/registp/entryform5.htm";
+            } else {
+                resultType = "しっかり導くママ";
+                formUrl = "https://55auto.biz/akko/registp/entryform6.htm";
+            }
+            
+            // 結果を表示（タイプ名は表示しない）
+            document.getElementById('emailButton').href = formUrl;
+            
+            // プログレスバーを100%に
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        // 初期化
+        updateProgress();
+    </script>
+</body>
+</html>
